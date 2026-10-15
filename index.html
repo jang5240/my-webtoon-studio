@@ -78,7 +78,7 @@ footer{text-align:center;padding:18px;color:#82788e;font-size:12px}
 </main>
 <script>
 const $=id=>document.getElementById(id);
-let chars=[],cuts=[],gallery=[];
+let chars=JSON.parse(localStorage.getItem('ys_chars')||'[]'),cuts=JSON.parse(localStorage.getItem('ys_cuts')||'[]'),gallery=[];
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
 document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
 b.classList.add('active');
@@ -88,7 +88,7 @@ function readImage(file){return new Promise(resolve=>{if(!file)return resolve(''
 function safe(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function renderChars(){$('charList').className=chars.length?'':'empty';$('charList').innerHTML=chars.length?chars.map((c,i)=>`<div class="item"><h3>${safe(c.name)}</h3><p>${safe(c.look)}</p><p>${safe(c.story)}</p>${c.image?`<img class="preview" src="${c.image}">`:''}<button data-del-char="${i}">삭제</button></div>`).join(''):'아직 등록한 캐릭터가 없어요.';}
 function renderCuts(){$('cutList').className=cuts.length?'':'empty';$('cutList').innerHTML=cuts.length?cuts.map((c,i)=>`<div class="item"><h3>${safe(c.ep)} · 컷 ${safe(c.num)}</h3><p>${safe(c.scene)}</p><p>${safe(c.direction)}</p>${c.image?`<img class="preview" src="${c.image}">`:''}<button data-del-cut="${i}">삭제</button></div>`).join(''):'아직 등록한 컷이 없어요.';}
-
+$('saveChar').onclick=async()=>{const name=$('charName').value.trim();if(!name){alert('캐릭터 이름을 입력해 주세요.');return;}const image=await readImage($('charImage').files[0]);chars.push({name,look:$('charLook').value,story:$('charStory').value,image});renderChars();$('charName').value='';$('charLook').value='';$('charStory').value='';$('charImage').value='';};
 $('saveCut').onclick=async()=>{const num=$('cutNumber').value.trim();if(!num){alert('컷 번호를 입력해 주세요.');return;}const image=await readImage($('cutImage').files[0]);cuts.push({ep:$('episode').value||'1화',num,scene:$('cutScene').value,direction:$('cutDirection').value,image});renderCuts();$('cutNumber').value='';$('cutScene').value='';$('cutDirection').value='';$('cutImage').value='';};
 document.addEventListener('click',e=>{if(e.target.dataset.delChar!==undefined){chars.splice(Number(e.target.dataset.delChar),1);renderChars();}if(e.target.dataset.delCut!==undefined){cuts.splice(Number(e.target.dataset.delCut),1);renderCuts();}});
 $('galleryFile').onchange=async e=>{for(const file of e.target.files){const src=await readImage(file);gallery.push({name:file.name,src});} $('galleryList').innerHTML=gallery.map((g,i)=>`<div class="item"><p>${safe(g.name)}</p><img class="preview" src="${g.src}"><button data-del-gallery="${i}">삭제</button></div>`).join('');};
